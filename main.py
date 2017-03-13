@@ -4,7 +4,8 @@ import logging
 import importlib.util
 import os
 import sys
-import time
+import time 
+import importlib
 
 broker_addr = "192.168.1.10"
 log_format = '%(asctime)s %(levelname)s: %(message)s'
@@ -16,25 +17,24 @@ logging.info("Home-Assistant Helper v0 - started")
 def load_subsystems():
     subsystems = [] 
     
-    for entry in os.scandir('.'):
-        if entry.is_file() and entry.name.startswith("sub."):
-            mod_name = os.path.split(entry.name)[-1][4:][:-3]
-            spec = importlib.util.spec_from_file_location(mod_name, entry.name)
-            mod = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(mod)
-            subsystems.append(mod) 
+    for entry in os.listdir('.'):
+        if os.path.isfile(entry) and entry.startswith("sub_"):
+            p, m = entry.rsplit('.', 1)
+            mod = importlib.import_module(p)
+            instance = getattr(mod, "instance")
+            subsystems.append(instance)
 
     return subsystems
 
 def on_connect(client, userdata, flags, rc):
     for subsys in userdata:
-        logging.debug("Subscribing: {}".format(subsys.instance.topic))
-        client.subscribe(subsys.instance.topic)
+        logging.debug("Subscribing: {}".format(subsys.topic))
+        client.subscribe(subsys.topic)
 
 def on_message(client, userdata, message):
     for subsys in userdata:
-        if message.topic in str(subsys.instance.topic):
-            return subsys.instance.on_message(client, message)
+        if message.topic in str(subsys.topic):
+            return subsys.on_message(client, message)
 
 def main():
     client = mqtt.Client(userdata=load_subsystems())

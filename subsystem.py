@@ -1,6 +1,6 @@
 import logging
 
-relay_topic = "dbg/devices/m-duino/relay/{}/set"
+relay_topic = "devices/m-duino/relay/{}/set"
 
 class Subsystem():
     def __init__(self):
