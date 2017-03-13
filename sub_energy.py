@@ -15,18 +15,18 @@ class Energy(subsystem.Subsystem):
     def on_message(self, client, message):
         cur = datetime.datetime.now()
         energy = json.loads(message.payload.decode("utf-8") )
-        logging.debug(energy)
 
         if self.prev != None:
-            elapsed = (cur - self.prev)/3600 # hours
+            elapsed = (cur - self.prev)
             logging.debug("elasped: {} seconds".format(elapsed.total_seconds()))
+            elapsed = elapsed.total_seconds() / 3600
         self.prev = cur
 
         if self.last != None:
             consumption = dict()
             for i in range(len(energy['ct'])):
                 if meter[i] != None:
-                    kwh = (energy['ct'][i]+self.last[i])/2000 * float(elapsed.total_seconds())
+                    kwh = (energy['ct'][i]+self.last[i])/2000 * float(elapsed)
                     logging.debug("{}: {:.10f} kWh".format(meter[i], kwh))
                     consumption[meter[i]] = "{:.10f}".format(kwh)
             client.publish(self.root_topic + energy_topic, payload = json.dumps(consumption))
