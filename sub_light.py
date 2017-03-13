@@ -4,8 +4,8 @@ import json
 import subsystem
 import re
 
-state_topic = "switch/{}"
-command_topic = "switch/{}/set"
+state_topic = "light/{}"
+command_topic = "light/{}/set"
 
 # tuple -> relay, impulse
 lights = {
@@ -17,14 +17,14 @@ lights = {
 class Switch(subsystem.Subsystem):
     def __init__(self):
         super().__init__()
-        self.topic = [(self.root_topic + command_topic.format(switch), 0) for switch in lights.keys()] 
+        self.topic = [(self.root_topic + command_topic.format(light), 0) for light in lights.keys()] 
 
     def on_message(self, client, msg):
         try:
-            switch = re.search(command_topic.format('(.+?)'), msg.topic).group(1)
-            relay, impulse = lights[switch]
+            light = re.search(command_topic.format('(.+?)'), msg.topic).group(1)
+            relay, impulse = lights[light]
             client.publish(subsystem.relay_topic.format(relay), payload=str(impulse))
-            client.publish(self.root_topic + state_topic.format(switch), payload=msg.payload, retain=True)
+            client.publish(self.root_topic + state_topic.format(light), payload=msg.payload, retain=True)
         except Exception as e:
             logging.error(e)
             client.publish(msg.topic+"/error", payload=str(e), retain=True)
