@@ -8,6 +8,7 @@ import time
 import importlib
 
 broker_addr = "192.168.1.10"
+subsystems_dir = "subs"
 log_format = '%(asctime)s %(levelname)s: %(message)s'
 logging.basicConfig(format=log_format, level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -17,10 +18,10 @@ logging.info("Home-Assistant Helper v0 - started")
 def load_subsystems():
     subsystems = [] 
     
-    for entry in os.listdir('.'):
-        if os.path.isfile(entry) and entry.startswith("sub_"):
+    for entry in os.listdir(subsystems_dir):
+        if os.path.isfile(subsystems_dir+"/"+entry):
             p, m = entry.rsplit('.', 1)
-            mod = importlib.import_module(p)
+            mod = importlib.import_module(subsystems_dir+"."+p)
             instance = getattr(mod, "instance")
             subsystems.append(instance)
 
