@@ -10,6 +10,7 @@ command_topic = "switch/{}/set"
 # tuple -> relay, impulse
 switches = {
     'toalheiros': (105, 1000),
+    'rega': (10, 1000),
     }
 
 class Switch(subsystem.Subsystem):
@@ -22,7 +23,7 @@ class Switch(subsystem.Subsystem):
             switch = re.search(command_topic.format('(.+?)'), msg.topic).group(1)
             relay, impulse = switches[switch]
             client.publish(subsystem.relay_topic.format(relay), payload=str(impulse))
-            client.publish(state_topic.format(switch), payload=msg.payload)
+            client.publish(self.root_topic + state_topic.format(switch), payload=msg.payload, retain=True)
         except Exception as e:
             logging.error(e)
             client.publish(msg.topic+"/error", payload=str(e), retain=True)
