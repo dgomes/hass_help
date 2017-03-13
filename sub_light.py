@@ -14,7 +14,7 @@ lights = {
     'muros_tras': (6, 1000),
     }
 
-class Switch(subsystem.Subsystem):
+class Light(subsystem.Subsystem):
     def __init__(self):
         super().__init__()
         self.topic = [(self.root_topic + command_topic.format(light), 0) for light in lights.keys()] 
@@ -29,4 +29,4 @@ class Switch(subsystem.Subsystem):
             logging.error(e)
             client.publish(msg.topic+"/error", payload=str(e), retain=True)
 
-instance = Switch()
+instance = Light()
