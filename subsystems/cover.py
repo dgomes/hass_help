@@ -36,6 +36,7 @@ class Cover(subsystem.Subsystem):
                 client.publish(subsystem.relay_topic.format(down), payload=time_down)
                 state = "0"
             elif "STOP" in str(msg.payload):
+                logging.info("{} STOP".format(cover))
                 client.publish(subsystem.relay_topic.format(up), payload="false")
                 client.publish(subsystem.relay_topic.format(down), payload="false")
                 state = "50"
